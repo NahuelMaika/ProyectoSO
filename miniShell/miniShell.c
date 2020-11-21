@@ -7,8 +7,10 @@
 #include <fcntl.h>
 #include <string.h>
 #include <dirent.h>
-//#define _XOPEN_SOURCE 700
 
+/*
+ * Todos los ejecutables de los comandos deben estar en la misma carpeta de este mismo archivo "miniShell.c"
+ */
 int main(){
 	char comando[1000000];
 	char cwd[PATH_MAX];
@@ -25,26 +27,34 @@ int main(){
 		coman2 = strtok(comando, " ");
 		printf("Coman2 %s\n", coman2);
 		
-		strcpy(argumento1, coman2);
+		if(coman2 != NULL)
+			strcpy(argumento1, coman2);
 		printf("Argumento1: %s\n", argumento1);
 		
 		coman2 = strtok(NULL, " ");
-		strcpy(argumento2, coman2);
+		if(coman2 != NULL)
+			strcpy(argumento2, coman2);
 		printf("Argumento2: %s\n", argumento2);
 
 		coman2 = strtok(NULL, " ");
 		if(coman2 != NULL)
-		strcpy(argumento3, coman2);
+			strcpy(argumento3, coman2);
 		printf("Argumento3: %s\n", argumento3);
+		
 		char *const argv2[] = {argumento1, argumento2, argumento3,NULL};
 		
-		char direccion[1000000]= "/home/pi/Desktop/ProyectoSO/";
+		char *direccion = getcwd(cwd, sizeof(cwd));
+		strcat(direccion,"/");
 		strcat(direccion, argumento1);
 		printf("Direccion completa: %s\n", direccion);
 		
-		execv(direccion, argv2);
-		printf("Error en programa 1 execv\n");
-		
+		int pid = fork();
+		if(pid > 0){
+			wait(NULL);
+		}else 
+			if(pid == 0){
+				execv(direccion, argv2);
+				printf("Error en programa 1 execv\n");
+			}else printf("Error al crear el proceso");
 	}
 }
-

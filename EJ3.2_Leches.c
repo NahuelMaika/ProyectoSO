@@ -7,7 +7,7 @@
 #include <sys/msg.h>
 #include <errno.h>
 
-#define cant_procesos 3
+#define cant_procesos 15
 #define FILE_PATH "/home/pi/Desktop/Proyecto"
 #define Tipo1 1L //leche
 #define Tipo2 2L //comprarleche
@@ -72,6 +72,8 @@ void comportamiento_comp(int * data,int queueId){
 
 int main(){
 	
+	
+	
 	pid_t pid=getpid();
 	key_t key = ftok(FILE_PATH, 1);
 	if(key < 0){
@@ -79,6 +81,13 @@ int main(){
 	}
 
 	int queueId = msgget(key,0666 | IPC_CREAT);
+	if(queueId < 0){
+		report_and_exit("msgget");
+	}
+	
+	msgctl(queueId,IPC_RMID,NULL); //Cierro la cola
+	
+	queueId = msgget(key,0666 | IPC_CREAT);
 	if(queueId < 0){
 		report_and_exit("msgget");
 	}
@@ -103,9 +112,7 @@ int main(){
 		msgsnd(queueId,&men,SIZE_MSG,0);
 		printf("Soy el proceso padre y mi pid es: %i\n",getpid());
 		for(int i=0;i<cant_procesos;i++)
-			wait(NULL);
-			
-		msgctl(queueId,IPC_RMID,NULL);
+			wait(NULL);	
 	}
 	
 	exit(0);

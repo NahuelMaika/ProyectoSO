@@ -1,0 +1,11 @@
+Comida rapida inciso II
+
+Nuestra solución consta de la ultilización de 7 semáforos para la cordinación de tareas. Cuando un cliente se sienta en una mesa automaticamente resta la cantidad de mesas disponibles para nuevos clientes, esto se controla con el semáforo "mesas". Tambien hace un pedido al camarero usando el semaforo "pedidoParaCamarero", despues de esto se queda esperando a que el camarero le traiga su pedido mediante un wait del semaforo "plato". Cuando el cliente termina de comer, se levanta dando una señal al limpiador para que limpie la mesa mediante el semáfoto "clienteSeLevanta".
+
+Los tres cocineros siempre están cocinando y solo paran cuando no hay más lugar en la cola de platos, esto se controla con el semáforo "cola". Al preparar un plato el cocinero utiliza el semáforo "comida" para avisar al camarero que el plato está listo.
+
+El camarero siempre está esperando que le hagan un pedido mediante el semaforo "pedidoParaCamarero", cuando obtiene el pedido espera a que los cocineros le entreguen el plato mediante el semáforo "comida". Cuando el camarero retira el plato, incrementa un lugar en la cola de platos y entrega el plato al cliente mediante los semaforos "cola" y "plato" respectivamente.
+
+El limpiador siempre está esperando a que un cliente se levante de la mesa y le de la señal para limpiar mediante el semáforo "clienteSeLevanta", cuando termian de limpiar habilita la mesa con el semáforo "mesas".
+
+El problema que le encontramos a este inciso es que se puede retrasar la atención a los clientes al tener únicamente un camarero y un limpiador.

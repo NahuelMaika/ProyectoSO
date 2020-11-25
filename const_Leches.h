@@ -1,5 +1,5 @@
 #define cant_procesos 15
-#define FILE_PATH "/home/pi/Desktop/Proyecto"
+#define FILE_PATH "const_Leches.h"
 #define Tipo1 1L //leche
 #define Tipo2 2L //comprarleche
 #define Tipo3 3L

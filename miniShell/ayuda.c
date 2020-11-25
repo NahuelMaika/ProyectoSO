@@ -3,9 +3,7 @@
 
 int main(int argc, char *argv[]){
 	printf("Los comandos posibles son: \n");
-	printf("mkdir - crea directorios \n");
-	printf("SYNOPSYS \n");
-	
+	printf("mkdir - crea directorios \n");	
 	printf("Crear directorio mkdir 'nombre del nuevo directorio' \n");
 	printf("Eliminar un directorio rmdir 'nombre del dir a borrar' \n");
 	printf("Crear un archivo mkfil 'nombre del archivo' \n");

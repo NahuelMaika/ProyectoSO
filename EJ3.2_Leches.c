@@ -6,24 +6,8 @@
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <errno.h>
+#include "const_Leches.h"
 
-#define cant_procesos 15
-#define FILE_PATH "/home/pi/Desktop/Proyecto"
-#define Tipo1 1L //leche
-#define Tipo2 2L //comprarleche
-#define Tipo3 3L
-
-struct message{
-	long type;
-};
-typedef struct message tMessage;
-
-#define SIZE_MSG sizeof(struct message) - sizeof(long)
-
-void report_and_exit(const char* msg){
-	perror(msg);
-	exit(EXIT_FAILURE);
-}
 
 void comportamiento_comp(int * data,int queueId){
 	int *aux=data;
@@ -33,7 +17,6 @@ void comportamiento_comp(int * data,int queueId){
 	sleep(1);
 	while(1){	
 		msgrcv(queueId,&rcv1,SIZE_MSG,Tipo1,IPC_NOWAIT);
-		printf("(%i): rcv1 %li\n",i,rcv1.type);
 		if(rcv1.type == Tipo1){//Hay leche
 			printf("(Compañero %i): Miro el refrigerador y hay leche\n",i);
 			printf("(Compañero %i): Consumo una botella de leche\n",i);	
@@ -45,7 +28,6 @@ void comportamiento_comp(int * data,int queueId){
 			sleep(1);
 			printf("(Compañero %i): Miro el refrigerador y no hay leche\n",i);
 			msgrcv(queueId,&rcv1,SIZE_MSG,Tipo2,IPC_NOWAIT);
-			printf("(%i): rcv1 %li\n",i,rcv1.type);
 			if(rcv1.type == Tipo2){//Voy a comprar
 				printf("(Compañero %i): Voy al supermercado\n",i);
 				sleep(1);
@@ -112,7 +94,9 @@ int main(){
 		msgsnd(queueId,&men,SIZE_MSG,0);
 		printf("Soy el proceso padre y mi pid es: %i\n",getpid());
 		for(int i=0;i<cant_procesos;i++)
-			wait(NULL);	
+			wait(NULL);
+			
+		
 	}
 	
 	exit(0);

@@ -8,7 +8,7 @@
 #include <sys/msg.h>
 #include <ctype.h>
 #include <pthread.h>
-#include "constantes.h"
+#include "constComidaRapida.h"
 #include <time.h>
 
 #define M 30	//Mesas

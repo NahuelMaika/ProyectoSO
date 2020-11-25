@@ -8,4 +8,4 @@ El camarero siempre está esperando que le hagan un pedido mediante el semaforo 
 
 El limpiador siempre está esperando a que un cliente se levante de la mesa y le de la señal para limpiar mediante el semáforo "clienteSeLevanta", cuando termian de limpiar habilita la mesa con el semáforo "mesas".
 
-El problema que le encontramos a este inciso es que se puede retrasar la atención a los clientes al tener únicamente un camarero y un limpiador.
+El problema que le encontramos a este inciso es que se puede retrasar la atención a los clientes al tener únicamente un camarero y un limpiador. Además el cocinero siempre está preparando platos tenga o no tenga clientes nuevos, solo para cuando la cola está llena.

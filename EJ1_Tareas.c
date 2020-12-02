@@ -241,6 +241,42 @@ void coord_C(){
 	}
 }
 
+void crearMsjA(int cant){
+	for(int i=0;i<cant;i++){
+		MsjCA mensajeCA = malloc(sizeof(struct MCA));
+		MsjA *mA = malloc(sizeof(struct MA));
+		mA->color=rand()%4;
+		mA->trabajo=rand()%2;
+		mensajeCA->cantidad = cant;
+		mensajeCA->mensaje = *mA;
+		write(pipeA[1],mensajeCA,sizeof(struct MCA));	
+	}
+}
+
+void crearMsjB(int cant){
+	for(int i=0;i<cant;i++){
+		MsjCB mensajeCB1 = malloc(sizeof(struct MCB));
+		mensajeCB1->cantidad = cant;
+		mensajeCB1->trabajo = rand()%2;
+		write(pipeB[1],mensajeCB1,sizeof(struct MCB));
+	}
+}
+
+void crearMsjC(int cant){
+	for(int i=0;i<cant;i++){
+		MsjCC mensajeCC1 = malloc(sizeof(struct MCC));
+		MsjC *mC1 = malloc(sizeof(struct MC));
+		mC1->trabajo=rand()%2;
+		if(mC1->trabajo == ReparacionLlanta)
+			mC1->llantas=(rand()%4) + 1;
+		if(mC1->trabajo == RotyBalanceo)
+			mC1->llantas=0;
+		mensajeCC1->cantidad = cant;
+		mensajeCC1->mensaje = *mC1;
+		write(pipeC[1],mensajeCC1,sizeof(struct MCC));
+	}
+}
+
 int main(){
 	srand(time(NULL));
 	
@@ -285,18 +321,6 @@ int main(){
 		int num=1;
 		int a,b,c;
 		
-		
-		MsjCA mensajeCA = malloc(sizeof(struct MCA));
-		MsjA *mA = malloc(sizeof(struct MA));
-		MsjCA mensajeCA1 = malloc(sizeof(struct MCA));
-		MsjA *mA1 = malloc(sizeof(struct MA));
-		MsjCB mensajeCB1 = malloc(sizeof(struct MCB));
-		MsjCB mensajeCB2 = malloc(sizeof(struct MCB));
-		MsjCC mensajeCC1 = malloc(sizeof(struct MCC));
-		MsjC *mC1 = malloc(sizeof(struct MC));
-		MsjCC mensajeCC2 = malloc(sizeof(struct MCC));
-		MsjC *mC2 = malloc(sizeof(struct MC));
-		
 		while(num != 0){
 			printf("Ingrese el numero 0 para salir, 4,5 o 6 para ejecutar tareas: ");
 			scanf(" %i",&num);
@@ -308,67 +332,17 @@ int main(){
 				a=2;
 				b=2;
 		
-				mA->color=rand()%4;
-				mA->trabajo=rand()%2;
-				mensajeCA->cantidad = a;
-				mensajeCA->mensaje = *mA;
-				write(pipeA[1],mensajeCA,sizeof(struct MCA));
-				
-				mA1->color=rand()%4;
-				mA1->trabajo=rand()%2;
-				mensajeCA1->cantidad = a;
-				mensajeCA1->mensaje = *mA1;
-				write(pipeA[1],mensajeCA1,sizeof(struct MCA));
-				
-				
-				mensajeCB1->cantidad = b;
-				mensajeCB1->trabajo = rand()%2;
-				write(pipeB[1],mensajeCB1,sizeof(struct MCB));
-				
-				mensajeCB2->cantidad = b;
-				mensajeCB2->trabajo = rand()%2;
-				write(pipeB[1],mensajeCB2,sizeof(struct MCB));
+				crearMsjA(a);
+				crearMsjB(b);
 			}
 			if(num == Caso2){
 				a=2;
 				b=1;
 				c=2;
 				
-				mA->color=rand()%4;
-				mA->trabajo=rand()%2;
-				mensajeCA->cantidad = a;
-				mensajeCA->mensaje = *mA;
-				write(pipeA[1],mensajeCA,sizeof(struct MCA));
-				
-				mA1->color=rand()%4;
-				mA1->trabajo=rand()%2;
-				mensajeCA1->cantidad = a;
-				mensajeCA1->mensaje = *mA1;
-				write(pipeA[1],mensajeCA1,sizeof(struct MCA));
-				
-			
-				mensajeCB1->cantidad = b;
-				mensajeCB1->trabajo = rand()%2;
-				write(pipeB[1],mensajeCB1,sizeof(struct MCB));
-				
-			
-				mC1->trabajo=rand()%2;
-				if(mC1->trabajo == ReparacionLlanta)
-					mC1->llantas=(rand()%4) + 1;
-				if(mC1->trabajo == RotyBalanceo)
-					mC1->llantas=0;
-				mensajeCC1->cantidad = c;
-				mensajeCC1->mensaje = *mC1;
-				write(pipeC[1],mensajeCC1,sizeof(struct MCC));
-				
-				mC2->trabajo=rand()%2;
-				if(mC2->trabajo == ReparacionLlanta)
-					mC2->llantas=(rand()%4) + 1;
-				if(mC2->trabajo == RotyBalanceo)
-					mC2->llantas=0;
-				mensajeCC2->cantidad = c;
-				mensajeCC2->mensaje = *mC2;
-				write(pipeC[1],mensajeCC2,sizeof(struct MCC));	
+				crearMsjA(a);
+				crearMsjB(b);
+				crearMsjC(c);				
 			}
 			
 			if(num == Caso3){
@@ -376,63 +350,12 @@ int main(){
 				b=2;
 				c=2;
 				
-				mA->color=rand()%4;
-				mA->trabajo=rand()%2;
-				mensajeCA->cantidad = a;
-				mensajeCA->mensaje = *mA;
-				write(pipeA[1],mensajeCA,sizeof(struct MCA));
-				
-				mA1->color=rand()%4;
-				mA1->trabajo=rand()%2;
-				mensajeCA1->cantidad = a;
-				mensajeCA1->mensaje = *mA1;
-				write(pipeA[1],mensajeCA1,sizeof(struct MCA));
-				
-				
-				mensajeCB1->cantidad = b;
-				mensajeCB1->trabajo = rand()%2;
-				write(pipeB[1],mensajeCB1,sizeof(struct MCB));
-				
-				mensajeCB2->cantidad = b;
-				mensajeCB2->trabajo = rand()%2;
-				write(pipeB[1],mensajeCB2,sizeof(struct MCB));
-				
-			
-				mC1->trabajo=rand()%2;
-				if(mC1->trabajo == ReparacionLlanta)
-					mC1->llantas=(rand()%4) + 1;
-				if(mC1->trabajo == RotyBalanceo)
-					mC1->llantas=0;
-				mensajeCC1->cantidad = c;
-				mensajeCC1->mensaje = *mC1;
-				write(pipeC[1],mensajeCC1,sizeof(struct MCC));
-				
-				mC2->trabajo=rand()%2;
-				if(mC2->trabajo == ReparacionLlanta)
-					mC2->llantas=(rand()%4) + 1;
-				if(mC2->trabajo == RotyBalanceo)
-					mC2->llantas=0;
-				mensajeCC2->cantidad = c;
-				mensajeCC2->mensaje = *mC2;
-				write(pipeC[1],mensajeCC2,sizeof(struct MCC));		
+				crearMsjA(a);
+				crearMsjB(b);
+				crearMsjC(c);	
 			}
 			sleep(5);
 		}
-		free(mA);
-		free(mensajeCA);
-							
-		free(mA1);
-	    free(mensajeCA1);
-				
-		free(mensajeCB1);
-				
-		free(mensajeCB2);
-				
-		free(mC1);
-		free(mensajeCC1);
-				
-		free(mC2);
-		free(mensajeCC2);
 		
 		kill(pidA,SIGKILL);
 		kill(pidB,SIGKILL);

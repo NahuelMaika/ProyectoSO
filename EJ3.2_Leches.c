@@ -12,50 +12,41 @@
 void comportamiento_comp(int * data,int queueId){
 	int *aux=data;
 	int i=*aux;
-	tMessage rcv1,snd1,snd2;
-	rcv1.type=-5;
+	tMessage rcv1,snd1;
 	sleep(1);
 	while(1){	
-		msgrcv(queueId,&rcv1,SIZE_MSG,Tipo1,IPC_NOWAIT);
-		if(rcv1.type == Tipo1){//Hay leche
-			printf("(Compañero %i): Miro el refrigerador y hay leche\n",i);
-			printf("(Compañero %i): Consumo una botella de leche\n",i);	
-			snd2.type = Tipo2;
-			msgsnd(queueId,&snd2,SIZE_MSG,0);//Mando msj de que hay que ir a comprar*/
-			rcv1.type=-4;
-			sleep(1);
-		}else{//No hay leche
-			sleep(1);
+		sleep(1);
+		if(msgrcv(queueId,&rcv1,SIZE_MSG,Tipo1,IPC_NOWAIT)){ //No hay leche
 			printf("(Compañero %i): Miro el refrigerador y no hay leche\n",i);
-			msgrcv(queueId,&rcv1,SIZE_MSG,Tipo2,IPC_NOWAIT);
-			if(rcv1.type == Tipo2){//Voy a comprar
+			if(msgrcv(queueId,&rcv1,SIZE_MSG,Tipo2,IPC_NOWAIT)){ //ALGUIEN FUE A COMPRAR
+				printf("(Compañero %i): Alguien ya fue a comprar leche\n",i);
+				printf("(Compañero %i): Voy a hacer otras cosas\n",i);
+				sleep(1);
+			}else{//NO HAY NADIE COMPRANDO
 				printf("(Compañero %i): Voy al supermercado\n",i);
 				sleep(1);
 				printf("(Compañero %i): Llego al supermercado\n",i);
-				sleep(1);
 				printf("(Compañero %i): Compro leche\n",i);
+				printf("(Compañero %i): Llego a la casa y guardo la leche\n",i);
+				snd1.type=Tipo2;
+				msgsnd(queueId,&snd1,SIZE_MSG,IPC_NOWAIT);
+				snd1.type=Tipo1;
+				for(int i=0;i<4;i++) //Compro 4 LECHES
+					msgsnd(queueId,&snd1,SIZE_MSG,IPC_NOWAIT);
 				sleep(1);
-				printf("(Compañero %i): Llegue a la casa y guarde la leche\n",i);
-				snd1.type = Tipo1;
-				msgsnd(queueId,&snd1,SIZE_MSG,0);
-				rcv1.type=-3;
-				sleep(1);
-			}else{
-				printf("(Compañero %i): Alguien ya fue a comprar leche\n",i);
-				printf("(Compañero %i): Voy a hacer otras cosas\n",i);
-				sleep(3);
-			}
-				
+			}	
+		}else{ //HAY LECHES
+			printf("(Compañero %i): Miro el refrigerador y hay leche\n",i);
+			printf("(Compañero %i): Consumo una botella de leche\n",i);		
+			sleep(1);
 		}
+		sleep(1);
 	}
 	
 	exit(0);
 }
 
 int main(){
-	
-	
-	
 	pid_t pid=getpid();
 	key_t key = ftok(FILE_PATH, 1);
 	if(key < 0){
@@ -90,13 +81,15 @@ int main(){
 	
 	if(pid>0){
 		tMessage men;
+		men.type=Tipo2;
+		msgsnd(queueId,&men,SIZE_MSG,IPC_NOWAIT);
 		men.type=Tipo1;
-		msgsnd(queueId,&men,SIZE_MSG,0);
-		printf("Soy el proceso padre y mi pid es: %i\n",getpid());
+		for(int i=0;i<4;i++) //CREO 4 LECHES
+			msgsnd(queueId,&men,SIZE_MSG,IPC_NOWAIT);
+			
 		for(int i=0;i<cant_procesos;i++)
 			wait(NULL);
 			
-		
 	}
 	
 	exit(0);

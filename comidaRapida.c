@@ -15,7 +15,9 @@ sem_t cola, mesas, pedidoParaCamarero, limpiar, comida, clienteSeLevanta, plato;
 /*
  * Un cliente come su comida y se va
  */
-void * comer(int i){ // Pasar por parametro el nuemro de cliente para imprimir
+void * comer(void * arg){ // Pasar por parametro el nuemro de cliente para imprimir
+	int i = *(int*)arg;
+	free(arg);
 	
 	sem_wait(&mesas);
 	printf("\nSoy el Cliente nro: %i y me sente en una mesa\n", i+1);
@@ -31,8 +33,9 @@ void * comer(int i){ // Pasar por parametro el nuemro de cliente para imprimir
 /*
  * Los cocineros preparan la comida y la ponen en la cola de capacidad 10
  */
-void * cocinar(int i){
-	// resto un lugar en el semaforo cola = pongo un nuevo plato de comida
+void * cocinar(void * arg){
+	int i = *(int*)arg;
+	free(arg);
 	while(1){
 		sem_wait(&cola);
 		printf("\nSoy cocinero %i y estoy cocinando.......entrego un plato de comida\n", i);
@@ -45,7 +48,7 @@ void * cocinar(int i){
 /*
  * El camarero toma la comida de la cola y la entrega a un cliente que ha pedido una comida
  */
-void * entrgarComida(void * arg){
+void * entregarComida(void * arg){
 	while(1){
 		sem_wait(&pedidoParaCamarero);
 		
@@ -69,8 +72,7 @@ void * limpiarMesa(void * arg){
 	pthread_exit(0);
 }
 
-int main(){
-	
+void crearSemaforos(){
 	sem_init(&cola, 0, 10);
 	sem_init(&mesas, 0, 30); 
 	sem_init(&clienteSeLevanta, 0, 0);
@@ -78,18 +80,27 @@ int main(){
 	sem_init(&limpiar, 0, 0);
 	sem_init(&comida, 0, 0);
 	sem_init(&plato, 0, 0);
+}
 
+int main(){
+	crearSemaforos();
+	
 	pthread_t cliente[N], cocinero[C], camarero, limpiador;
+	int *aux;
 	for(int i=0; i < C; i++){
-		pthread_create(&cocinero[i], NULL, *cocinar, i);
+		aux = malloc(sizeof(int));
+		*aux=i;
+		pthread_create(&cocinero[i], NULL, cocinar, aux);
 	}
 	
 	for(int i=0; i < N; i++){
-		pthread_create(&cliente[i], NULL, *comer, i);
+		aux = malloc(sizeof(int));
+		*aux=i;
+		pthread_create(&cliente[i], NULL, comer, aux);
 	}
 	
-	pthread_create(&camarero, NULL, *entrgarComida, NULL);
-	pthread_create(&limpiador, NULL, *limpiarMesa, NULL);
+	pthread_create(&camarero, NULL, entregarComida, NULL);
+	pthread_create(&limpiador, NULL, limpiarMesa, NULL);
 	
 	pthread_join(camarero, NULL);
 	pthread_join(limpiador, NULL);

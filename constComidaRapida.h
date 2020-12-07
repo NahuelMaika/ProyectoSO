@@ -1,19 +1,28 @@
 
 struct message {
   long type;
-  char body[10];
 };
 typedef struct message tMessage;
 
 #define FINISH "exit"
 #define SIZE_MSG sizeof(tMessage) - sizeof(long)
 #define FILE_PATH "constComidaRapida.h"
-#define Tipo_Mesas 1L 
-#define Tipo_Carne 2L 
-#define Tipo_Vegetal 3L 
-#define Tipo_Camarero 4L 
-#define Tipo_Limpiador 5L 
-#define Tipo_Cola_Comida 6L 
+#define Tipo_Carne_Pedido 1L 
+#define Tipo_Vegetal_Pedido 2L 
+#define Tipo_Mesas 3L 
+
+#define Tipo_Carne_Cocinar 1L 
+#define Tipo_Vegetal_Cocinar 2L 
+
+#define Tipo_Vegetal_Listo 4L
+#define Tipo_Carne_Listo 5L
+#define Tipo_Limpiador 6L 
+
+#define Tipo_Carne 7L 
+#define Tipo_Vegetal 8L 
+
+
+
 
 
 

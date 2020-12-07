@@ -16,9 +16,9 @@ void comportamiento_comp(int * data,int queueId){
 	sleep(1);
 	while(1){	
 		sleep(1);
-		if(msgrcv(queueId,&rcv1,SIZE_MSG,Tipo1,IPC_NOWAIT)){ //No hay leche
+		if(msgrcv(queueId,&rcv1,SIZE_MSG,Tipo_Leche,IPC_NOWAIT)){ //No hay leche
 			printf("(Compañero %i): Miro el refrigerador y no hay leche\n",i);
-			if(msgrcv(queueId,&rcv1,SIZE_MSG,Tipo2,IPC_NOWAIT)){ //ALGUIEN FUE A COMPRAR
+			if(msgrcv(queueId,&rcv1,SIZE_MSG,Tipo_Compra,IPC_NOWAIT)){ //ALGUIEN FUE A COMPRAR
 				printf("(Compañero %i): Alguien ya fue a comprar leche\n",i);
 				printf("(Compañero %i): Voy a hacer otras cosas\n",i);
 				sleep(1);
@@ -28,9 +28,9 @@ void comportamiento_comp(int * data,int queueId){
 				printf("(Compañero %i): Llego al supermercado\n",i);
 				printf("(Compañero %i): Compro leche\n",i);
 				printf("(Compañero %i): Llego a la casa y guardo la leche\n",i);
-				snd1.type=Tipo2;
+				snd1.type=Tipo_Compra;
 				msgsnd(queueId,&snd1,SIZE_MSG,IPC_NOWAIT);
-				snd1.type=Tipo1;
+				snd1.type=Tipo_Leche;
 				for(int i=0;i<4;i++) //Compro 4 LECHES
 					msgsnd(queueId,&snd1,SIZE_MSG,IPC_NOWAIT);
 				sleep(1);
@@ -82,9 +82,9 @@ int main(){
 
 	if(pid>0){
 		tMessage men;
-		men.type=Tipo2;
+		men.type=Tipo_Compra;
 		msgsnd(queueId,&men,SIZE_MSG,IPC_NOWAIT);
-		men.type=Tipo1;
+		men.type=Tipo_Leche;
 		for(int i=0;i<4;i++) //CREO 4 LECHES
 			msgsnd(queueId,&men,SIZE_MSG,IPC_NOWAIT);
 			

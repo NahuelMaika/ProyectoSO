@@ -6,6 +6,7 @@
 #include <semaphore.h>
 
 #define cant_hilos 2
+#define cant_leches 4
 
 sem_t semLeche,semComprando;
 pthread_mutex_t mutex;
@@ -33,12 +34,10 @@ void * comportamiento_comp(void *data){
 					printf("(Compañero %i): Compro leche\n",i);
 					printf("(Compañero %i): Llego a la casa y guardo la leche\n",i);
 					pthread_mutex_lock(&mutex);
-					sem_post(&semLeche);
-					sem_post(&semLeche);
-					sem_post(&semLeche);
-					sem_post(&semLeche);
-					pthread_mutex_unlock(&mutex);
 					sem_post(&semComprando);
+					for(int i=0;i<cant_leches;i++)
+						sem_post(&semLeche);
+					pthread_mutex_unlock(&mutex);
 					sleep(1);
 				}
 		}else{//Hay leche

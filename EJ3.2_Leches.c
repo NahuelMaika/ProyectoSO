@@ -70,12 +70,15 @@ int main(){
 		if(pid>0){
 			cont=i;
 			pid=fork();	
+			if(pid<0)
+				exit(1);
 		}
+		
 		if(pid == 0)
 			comportamiento_comp(&cont,queueId);
+		
 	}
-	if(pid<0)
-		exit(1);
+	
 
 	if(pid>0){
 		tMessage men;

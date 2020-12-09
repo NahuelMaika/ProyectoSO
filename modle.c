@@ -4,6 +4,9 @@
 #include <sys/stat.h>
 
 int main(int argc, char *argv[]){
-	chmod(argv[1], atoi(argv[2]));
+	long int i = strtol(argv[2], 0, 8);
+	
+	if(chmod(argv[1], i) < 0)
+		printf("Error al cambiar permisos de archivo");
 	return 0;
 }

@@ -1,4 +1,4 @@
-all: tareas miniShell leches leches2 comidaRapidaSema comidaRapidaColaDeMensajes
+all: tareas miniShell leches leches2 comidaRapidaSema comidaRapidaColaDeMensajes mkdir ayuda mkfil modle rmdir showd showf
 
 ###########################Ej1 Tareas#########################################
 tareas: EJ1_Tareas.o
@@ -32,12 +32,28 @@ comidaRapidaSema: comidaRapida.o
 ComidaRapida.o: comidaRapida.c
 	gcc -Wall -lpthread -c comidaRapida.c
 
-#############Inciso C con colas de mensajes###################3
+#############Inciso C con colas de mensajes###############################
 comidaRapidaColaDeMensajes: ComidaRapida3.o
 	gcc -Wall -lpthread ComidaRapida3.o -o comidaRapidaColaDeMensajes
 
 ComidaRapida3.o: ComidaRapida3.c constComidaRapida.h
 	gcc -Wall -c -lpthread ComidaRapida3.c
+#############Ejecutables para Mini Shell##################################
+mkdir: mkdir.c
+	gcc -Wall mkdir.c -o mkdir
+ayuda: ayuda.c
+	gcc -Wall ayuda.c -o ayuda
+mkfil: mkfil.c
+	gcc -Wall mkfil.c -o mkfil
+modle: modle.c
+	gcc -Wall modle.c -o modle
+rmdir: rmdir.c
+	gcc -Wall rmdir.c -o rmdir
+showd: showd.c
+	gcc -Wall showd.c -o showd
+showf: showf.c
+	gcc -Wall showf.c -o showf
+
 
 clean:
-	rm -f *.o tareas miniShell leches leches2 comidaRapidaSema comidaRapidaColaDeMensajes
+	rm -f *.o tareas miniShell leches leches2 comidaRapidaSema comidaRapidaColaDeMensajes mkdir ayuda mkfil modle rmdir showd showf

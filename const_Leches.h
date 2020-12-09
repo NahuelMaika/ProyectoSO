@@ -2,6 +2,7 @@
 #define FILE_PATH "const_Leches.h"
 #define Tipo_Leche 1L //leche
 #define Tipo_Compra 2L //comprarleche
+#define Mutex_Lock 3L //Lock para la heladera
 
 struct message{
 	long type;

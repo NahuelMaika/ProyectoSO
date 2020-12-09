@@ -9,6 +9,7 @@
 #include "const_Leches.h"
 
 
+
 void comportamiento_comp(int * data,int queueId){
 	int *aux=data;
 	int i=*aux;
@@ -16,28 +17,39 @@ void comportamiento_comp(int * data,int queueId){
 	sleep(1);
 	while(1){	
 		sleep(1);
+		msgrcv(queueId,&rcv1,SIZE_MSG,Mutex_Lock,0);
 		if(msgrcv(queueId,&rcv1,SIZE_MSG,Tipo_Leche,IPC_NOWAIT)){ //No hay leche
 			printf("(Compañero %i): Miro el refrigerador y no hay leche\n",i);
 			if(msgrcv(queueId,&rcv1,SIZE_MSG,Tipo_Compra,IPC_NOWAIT)){ //ALGUIEN FUE A COMPRAR
 				printf("(Compañero %i): Alguien ya fue a comprar leche\n",i);
 				printf("(Compañero %i): Voy a hacer otras cosas\n",i);
+				snd1.type = Mutex_Lock;
+				msgsnd(queueId,&snd1,SIZE_MSG,IPC_NOWAIT);
 				sleep(1);
 			}else{//NO HAY NADIE COMPRANDO
+				snd1.type = Mutex_Lock;
+				msgsnd(queueId,&snd1,SIZE_MSG,IPC_NOWAIT);
 				printf("(Compañero %i): Voy al supermercado\n",i);
 				sleep(1);
 				printf("(Compañero %i): Llego al supermercado\n",i);
 				printf("(Compañero %i): Compro leche\n",i);
-				printf("(Compañero %i): Llego a la casa y guardo la leche\n",i);
+				msgrcv(queueId,&rcv1,SIZE_MSG,Mutex_Lock,0);
 				snd1.type=Tipo_Compra;
 				msgsnd(queueId,&snd1,SIZE_MSG,IPC_NOWAIT);
 				snd1.type=Tipo_Leche;
 				for(int i=0;i<4;i++) //Compro 4 LECHES
 					msgsnd(queueId,&snd1,SIZE_MSG,IPC_NOWAIT);
+					
+				printf("(Compañero %i): Llego a la casa y guardo la leche\n",i);	
+				snd1.type = Mutex_Lock;
+				msgsnd(queueId,&snd1,SIZE_MSG,IPC_NOWAIT);
 				sleep(1);
 			}	
 		}else{ //HAY LECHES
 			printf("(Compañero %i): Miro el refrigerador y hay leche\n",i);
-			printf("(Compañero %i): Consumo una botella de leche\n",i);		
+			printf("(Compañero %i): Consumo una botella de leche\n",i);
+			snd1.type = Mutex_Lock;
+			msgsnd(queueId,&snd1,SIZE_MSG,IPC_NOWAIT);		
 			sleep(1);
 		}
 		sleep(1);
@@ -87,6 +99,9 @@ int main(){
 		men.type=Tipo_Leche;
 		for(int i=0;i<4;i++) //CREO 4 LECHES
 			msgsnd(queueId,&men,SIZE_MSG,IPC_NOWAIT);
+		
+		men.type = Mutex_Lock;
+		msgsnd(queueId,&men,SIZE_MSG,IPC_NOWAIT);
 			
 		for(int i=0;i<cant_procesos;i++)
 			wait(NULL);

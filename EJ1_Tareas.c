@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/wait.h>
 #include <pthread.h>
 #include <time.h>
 #include <semaphore.h>
@@ -11,17 +10,6 @@
 #define Caso3 6
 
 #define cant_hilos 2
-
-#define Caso1_A 2
-#define Caso1_B 2
-
-#define Caso2_A 2
-#define Caso2_B 1
-#define Caso2_C 2
-
-#define Caso3_A 2
-#define Caso3_B 2
-#define Caso3_C 2
 
 #define TParcial 0
 #define TTotal 1
@@ -68,20 +56,20 @@ struct MCA{
 };
 typedef struct MCA *MsjCA;
 
-sem_t semA,semB,semC,coordA,coordB,coordC;
+
+sem_t semInicio,semFinal;
+
 
 int pipeA[2];
 int pipeB[2];
 int pipeC[2];
-int pipeFinalA[2];
-int pipeFinalB[2];
-int pipeFinalC[2];
+int pipeFinal[2];
 
 void * tareaA(void* data){
 	MsjA1 menA=data;
 	
 	while(1){
-		sem_wait(&semA);
+		sem_wait(&semInicio);
 		if(menA->trabajo == TParcial){
 				printf("(A): Voy a hacer una tarea parcial con el color %s\n",colores[menA->color]);
 				sleep(1);
@@ -93,7 +81,7 @@ void * tareaA(void* data){
 			 }
 		}
 		
-		sem_post(&coordA);
+		sem_post(&semFinal);
 	}
 }
 
@@ -102,12 +90,8 @@ void coord_A(){
 	close(pipeC[0]);
 	close(pipeA[1]);
 	close(pipeB[1]);
-	close(pipeC[1]);
-	close(pipeFinalB[1]);
-	close(pipeFinalC[1]);
-	close(pipeFinalA[0]);
-	close(pipeFinalB[0]);
-	close(pipeFinalC[0]);
+	close(pipeC[1]);	
+	close(pipeFinal[0]);
 	
 	MsjCA menCA1 =malloc(sizeof(struct MCA));
 	MsjA1 menA1 = malloc(sizeof(struct MA));
@@ -126,20 +110,20 @@ void coord_A(){
 		
 		menA1->color=menCA1->mensaje.color;
 		menA1->trabajo=menCA1->mensaje.trabajo;
-		sem_post(&semA);	
+		sem_post(&semInicio);
 		
 		for(int i=1;i<cant_tareas;i++){ //DEBERIA HACER UN DO-WHILE PERO NO PUEDO PUES AMBOS HILOS TIENEN DISTINTOS STRUCTS
 			read(pipeA[0],menCA1,sizeof(struct MCA));
 			menA2->color=menCA1->mensaje.color;
 			menA2->trabajo=menCA1->mensaje.trabajo;
-			sem_post(&semA);	
+			sem_post(&semInicio);
 		}
 			
 		for(int i=0; i<cant_tareas;i++){
-			sem_wait(&coordA);
+			sem_wait(&semFinal);
 			printf("Termine una Tarea A\n");
 			*res=Termine;
-			write(pipeFinalA[1],res,sizeof(int));
+			write(pipeFinal[1],res,sizeof(int));
 			*res=-1;
 		}
 	}
@@ -166,7 +150,7 @@ void * tareaB(void* data){
 	int menB;
 	
 	while(1){
-		sem_wait(&semB);
+		sem_wait(&semInicio);
 		menB = *aux;
 		if(menB == Verificacion){
 				printf("(B): Voy a hacer una verificacion\n");
@@ -177,11 +161,8 @@ void * tareaB(void* data){
 						sleep(2);
 						printf("(B): Termine de hacer el trabajo de reparacion\n");
 			}
-		int *ret;
-		ret=malloc(sizeof(int));
-		*ret=Termine;
-		write(pipeFinalB[1],ret,sizeof(int));
-		sem_post(&coordB);
+			
+		sem_post(&semFinal);
 	}
 }
 
@@ -191,11 +172,7 @@ void coord_B(){
 	close(pipeA[1]);
 	close(pipeB[1]);
 	close(pipeC[1]);
-	close(pipeFinalA[1]);
-	close(pipeFinalC[1]);
-	close(pipeFinalA[0]);
-	close(pipeFinalB[0]);
-	close(pipeFinalC[0]);
+	close(pipeFinal[0]);
 	
 	MsjCB menCB1 = malloc(sizeof(struct MCB));
 	int *mensajeB1;
@@ -214,19 +191,19 @@ void coord_B(){
 		cant_tareas = menCB1->cantidad;
 		printf("Cant tareas de B recibidas: %i\n",cant_tareas);
 		*mensajeB1=menCB1->trabajo;
-		sem_post(&semB);
+		sem_post(&semInicio);
 		
 		for(int i=1;i<cant_tareas;i++){
 			read(pipeB[0],menCB1,sizeof(struct MCB));
 			*mensajeB2=menCB1->trabajo;
-			sem_post(&semB);
+			sem_post(&semInicio);
 		}
 			
 		for(int i=0; i<cant_tareas;i++){
-			sem_wait(&coordB);
+			sem_wait(&semFinal);
 			printf("Termine una Tarea B\n");
 			*res=Termine;
-			write(pipeFinalB[1],res,sizeof(int));
+			write(pipeFinal[1],res,sizeof(int));
 			*res=-1;
 		}
 	}
@@ -248,7 +225,7 @@ void * tareaC(void* data){
 	MsjC1 menC=data;
 	
 	while(1){
-		sem_wait(&semC);
+		sem_wait(&semInicio);
 		if(menC->trabajo == ReparacionLlanta){
 				printf("(C): Voy a hacer una reparacion de %i llantas\n",menC->llantas);
 				sleep(menC->llantas);
@@ -260,7 +237,7 @@ void * tareaC(void* data){
 			}
 		
 		
-		sem_post(&coordC);
+		sem_post(&semFinal);
 	}
 }
 
@@ -270,11 +247,7 @@ void coord_C(){
 	close(pipeA[1]);
 	close(pipeB[1]);
 	close(pipeC[1]);
-	close(pipeFinalA[1]);
-	close(pipeFinalB[1]);
-	close(pipeFinalA[0]);
-	close(pipeFinalB[0]);
-	close(pipeFinalC[0]);
+	close(pipeFinal[0]);
 	
 	MsjCC menCC1 =malloc(sizeof(struct MCC));
 	MsjC1 menC1 = malloc(sizeof(struct MC));
@@ -293,21 +266,21 @@ void coord_C(){
 		
 		menC1->trabajo=menCC1->mensaje.trabajo;
 		menC1->llantas=menCC1->mensaje.llantas;
-		sem_post(&semC);
-			
+		sem_post(&semInicio);
+		
 		for(int i=1;i<cant_tareas;i++){
 			read(pipeC[0],menCC1,sizeof(struct MCC));
 			menC2->trabajo=menCC1->mensaje.trabajo;
 			menC2->llantas=menCC1->mensaje.llantas;
-			sem_post(&semC);		
+			sem_post(&semInicio);		
 		}
 		
 			
 		for(int i=0; i<cant_tareas;i++){
-			sem_wait(&coordC);
+			sem_wait(&semFinal);
 			printf("Termine una Tarea C\n");
 			*res=Termine;
-			write(pipeFinalC[1],res,sizeof(int));
+			write(pipeFinal[1],res,sizeof(int));
 			*res=-1;
 		}
 	}
@@ -330,16 +303,16 @@ void crearMsjC(int cant){
 
 
 
-
 int main(){
 	srand(time(NULL));
 	
 	pipe(pipeA);
 	pipe(pipeB);
 	pipe(pipeC);
-	pipe(pipeFinalA);
-	pipe(pipeFinalB);
-	pipe(pipeFinalC);
+	pipe(pipeFinal);
+	
+	sem_init(&semInicio,0,0);
+	sem_init(&semFinal,0,0);
 	
 	pid_t pid;
 	
@@ -365,11 +338,10 @@ int main(){
 		close(pipeA[0]);
 		close(pipeB[0]);
 		close(pipeC[0]);
-		close(pipeFinalA[1]);
-		close(pipeFinalB[1]);
-		close(pipeFinalC[1]);
+		close(pipeFinal[1]);
 		int num=1;
 		int a,b,c;
+		int waiting;
 		
 		int *res= malloc(sizeof(int));
 		*res=-1;
@@ -409,19 +381,11 @@ int main(){
 				crearMsjB(b);
 				crearMsjC(c);	
 			}
-			if(num == 2){
-				a=2;
-				c=2;
-				crearMsjA(a);
-				crearMsjC(c);
 			
-			}
-			for(int i=0;i<a;i++)
-				read(pipeFinalA[0],res,sizeof(int));
-			for(int i=0;i<b;i++)
-				read(pipeFinalB[0],res,sizeof(int));
-			for(int i=0;i<c;i++)
-				read(pipeFinalC[0],res,sizeof(int));
+			waiting = a + b + c;
+			for(int i=0;i<waiting;i++)
+				read(pipeFinal[0],res,sizeof(int));
+				
 				
 			
 		}
